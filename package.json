@@ -1,0 +1,12 @@
+{
+  "name": "ix-article-esbuild-2021",
+  "version": "1.0.0",
+  "description": "source code for ix esbuild article 2021",
+  "author": "lars gersmann",
+  "email": "ix-esbuild@boun.cr",
+  "devDependencies": {
+    "debug": "^4.3.1",
+    "esbuild": "^0.11.5",
+    "sass": "^1.32.8"
+  }
+}
