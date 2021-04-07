@@ -4,7 +4,7 @@
 
 - `make` for building
 - `ent` for watching filesystemm changes (used in make target `dev`)
-- `nodejs` v15.13.0 (alternatively use `nvm use` if `nvm is installed on yor machine)
+- `nodejs` v15.13.0 (alternatively use `nvm use` if `nvm` is installed on yor machine)
 
 # installation
 
