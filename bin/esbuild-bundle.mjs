@@ -68,12 +68,12 @@ function ESBuildGlobalExternalsPlugin({
   return {
     name,
     setup(build) {
-      build.onResolve({ filter: regexp }, ({ path, ...args }) => ({
+      build.onResolve({ filter: regexp }, ({ path }) => ({
         path,
         namespace: name,
       }));
 
-      build.onLoad({ filter: /.*/, namespace: name }, ({ path, ...args }) => {
+      build.onLoad({ filter: /.*/, namespace: name }, ({ path }) => {
         const defaultExportName = computeGlobalName(path.match(regexp));
         const contents = `export default ${defaultExportName};`;
         return { contents };
@@ -93,13 +93,13 @@ function ESBuildSassPlugin(options) {
   return {
     name,
     setup(build) {
-      build.onResolve({ filter: /\.scss$/ }, (args) => ({
-        path: resolve(args.resolveDir, args.path),
+      build.onResolve({ filter: /\.scss$/ }, ({ resolveDir, path }) => ({
+        path: resolve(resolveDir, path),
         namespace: name,
       }));
-      build.onLoad({ filter: /.*/, namespace: name }, (args) => {
+      build.onLoad({ filter: /.*/, namespace: name }, ({ path }) => {
         const result = sass.renderSync({
-          file: args.path,
+          file: path,
 
           // see options here : https://sass-lang.com/documentation/js-api#options
           // includePaths: ["node_modules/breakpoint-sass/stylesheets"],
