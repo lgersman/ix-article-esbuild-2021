@@ -1,13 +1,14 @@
 {
   "name": "ix-article-esbuild-2021",
   "version": "1.0.0",
-  "description": "source code for ix esbuild article 2021",
+  "description": "source code for ix esbuild article 2021 about esbuild plugin authoring. The example esbuild plugins will enable sass file transformation and mapping of @wordpress\\* packages to global variables",
   "author": "lars gersmann",
   "email": "ix-esbuild@boun.cr",
   "devDependencies": {
     "esbuild": "^0.12.17",
     "sass": "^1.37.0"
   },
+  "keywords" : ["esbuild" , "plugin", "development", "sass", "scss", "globals", "mapping", "wordpress", "gutenberg"],
   "peerDependencies": {
     "@wordpress/icons": "^5.0.0",
     "debug": "^4.3.1"
