@@ -6,7 +6,8 @@
  * Syntax: see help function
  */
 
-import { basename, resolve } from "path";
+import { basename, resolve, dirname, join } from "path";
+import { fileURLToPath } from "url";
 import { argv } from "process";
 
 import esbuild from "esbuild";
@@ -73,10 +74,36 @@ function ESBuildGlobalExternalsPlugin({
         namespace: name,
       }));
 
-      build.onLoad({ filter: /.*/, namespace: name }, ({ path }) => {
+      build.onLoad({ filter: /.*/, namespace: name }, async ({ path }) => {
+        const contents = [];
+
+        const absPath = join(
+          dirname(dirname(fileURLToPath(import.meta.url))),
+          "node_modules",
+          path,
+        );
+
+        // try to evaluate the named exports
+        try {
+          const module = await import(path);
+
+          const exports = Object.keys(module.default || module)
+            .filter(
+              (exportLiteral) =>
+                !["default", "__esModule"].includes(exportLiteral),
+            )
+            .join(", ");
+
+          contents.push(
+            `import { ${exports} } from '${absPath}';`,
+            `export { ${exports} };`,
+          );
+        } catch {}
+
         const defaultExportName = computeGlobalName(path.match(regexp));
-        const contents = `export default ${defaultExportName};`;
-        return { contents };
+        contents.push(`export default ${defaultExportName};`);
+
+        return { contents: contents.join("\n"), resolveDir: "/" };
       });
     },
   };
