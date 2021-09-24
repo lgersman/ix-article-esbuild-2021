@@ -125,7 +125,12 @@ function ESBuildSassPlugin(options) {
         namespace: name,
       }));
       build.onLoad({ filter: /.*/, namespace: name }, ({ path }) => {
-        const result = sass.renderSync({
+        const {
+            css,
+            stats: {
+                includedFiles
+            }
+        } = sass.renderSync({
           file: path,
 
           // see options here : https://sass-lang.com/documentation/js-api#options
@@ -142,7 +147,9 @@ function ESBuildSassPlugin(options) {
         });
 
         return {
-          contents: result.css.toString(),
+          contents: css.toString('utf-8'),
+          // see https://github.com/glromeo/esbuild-sass-plugin/blob/9759a6ff4b698acd7126b7237a10ff549b43389b/src/plugin.ts#L77
+          watchFiles: includedFiles, 
           loader: "css",
         };
       });
@@ -185,6 +192,16 @@ if (ARGS["global-name"]) {
 if (ARGS["debug"]) {
   ESBUILD_OPTIONS.sourcemap = "inline";
   delete ESBUILD_OPTIONS.minify;
+}
+
+// see https://esbuild.github.io/api/#watch
+if (ARGS["watch"]) {
+  ESBUILD_OPTIONS.watch = {
+    onRebuild(error, result) {
+      if (error) console.error('watch build failed:', error)
+      else console.log('watch build succeeded:', result)
+    },
+  };
 }
 
 esbuild.build(ESBUILD_OPTIONS).catch(() => process.exit(1));

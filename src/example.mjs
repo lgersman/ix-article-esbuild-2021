@@ -7,6 +7,9 @@ import Debug from "debug";
 
 import "./example.scss";
 
+import Component1 from "./components/component1.mjs";
+import Component2 from "./components/component2.mjs";
+
 // enable debug messages in js console
 Debug.enable("*");
 const mydebug = Debug("mydebug");
@@ -24,7 +27,11 @@ function MyButton({ label }) {
 
 domReady(() => {
   element.render(
-    <MyButton label="hello world" />,
+    <div>
+      <MyButton label="hello world" />
+      <Component1 text="c1" />
+      <Component1 text="c2" />
+    </div>,
     document.getElementById("editor"),
   );
 });
