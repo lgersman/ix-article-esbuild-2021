@@ -204,4 +204,13 @@ if (ARGS["watch"]) {
   };
 }
 
-esbuild.build(ESBUILD_OPTIONS).catch(() => process.exit(1));
+try {
+  let result = await esbuild.build(ESBUILD_OPTIONS);
+
+  let text = await esbuild.analyzeMetafile(result.metafile);
+  console.log(text);
+  process.exit(0);
+} catch(e) {
+  console.error(e);
+  process.exit(1);
+}
