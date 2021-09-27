@@ -184,28 +184,10 @@
    //treeShaking: true,
    plugins: [
      ESBuildGlobalExternalsPlugin({
-       // unfortunately we cannot use named capture groups since the regexp needs to be Go regex compatible
-       regexp:
-         /^(React|react|react-dom|lodash|@(wordpress))(\/(.+))?$/,
-       computeGlobalName: ([
-         ,
-         simplePackageName,
-         packageScope,
-         ,
-         packageName,
-       ]) => {
-         switch (packageScope || simplePackageName) {
-           case "React":
-             return `window.${simplePackageName}`;
-           case "react":
-           case "react-dom":
-             return "window.wp.element";
-           case "wordpress":
-             return `window.${
-               packageScope === "wordpress" ? "wp" : packageScope
-             }.${packageName.replace(/-(.)/g, (_, $1) => $1.toUpperCase())}`;
-         }
-       },
+      regexp: /^@wordpress\/(.+)?$/,
+      computeGlobalName: ([, wordpressPackage]) =>
+        "window.wp." +
+        wordpressPackage.replace(/-(.)/g, (_, $1) => $1.toUpperCase()),
      }),
      ESBuildSassPlugin(ARGS),
    ],
