@@ -82,6 +82,10 @@ function ESBuildGlobalExternalsPlugin({
           "node_modules",
           path,
         );
+        console.log(absPath);
+
+        const globalName = computeGlobalName(path.match(regexp));
+        contents.push(`export default ${globalName};`);
 
         // try to evaluate the named exports
         try {
@@ -94,14 +98,17 @@ function ESBuildGlobalExternalsPlugin({
             )
             .join(", ");
 
-          contents.push(
-            `import { ${exports} } from '${absPath}';`,
-            `export { ${exports} };`,
-          );
+          if(globalName) {
+            contents.push(
+              `export const { ${exports} } = ${globalName};`,
+            );
+          } else {
+            contents.push(
+              `import { ${exports} } from '${absPath}';`,
+              `export { ${exports} };`,
+            );
+          }
         } catch {}
-
-        const defaultExportName = computeGlobalName(path.match(regexp));
-        contents.push(`export default ${defaultExportName};`);
 
         return { contents: contents.join("\n"), resolveDir: "/" };
       });
@@ -173,13 +180,32 @@ const ESBUILD_OPTIONS = {
   jsxFactory: "window.wp.element.createElement",
   outfile: ARGS[OUTPUT_ARG],
   minify: true,
+  metafile: true,
+  //treeShaking: true,
   plugins: [
     ESBuildGlobalExternalsPlugin({
       // unfortunately we cannot use named capture groups since the regexp needs to be Go regex compatible
-      regexp: /^@wordpress\/(.+)?$/,
-      computeGlobalName: ([, wordpressPackage]) =>
-        "window.wp." +
-        wordpressPackage.replace(/-(.)/g, (_, $1) => $1.toUpperCase()),
+      regexp:
+        /^(React|react|react-dom|lodash|@(wordpress))(\/(.+))?$/,
+      computeGlobalName: ([
+        ,
+        simplePackageName,
+        packageScope,
+        ,
+        packageName,
+      ]) => {
+        switch (packageScope || simplePackageName) {
+          case "React":
+            return `window.${simplePackageName}`;
+          case "react":
+          case "react-dom":
+            return "window.wp.element";
+          case "wordpress":
+            return `window.${
+              packageScope === "wordpress" ? "wp" : packageScope
+            }.${packageName.replace(/-(.)/g, (_, $1) => $1.toUpperCase())}`;
+        }
+      },
     }),
     ESBuildSassPlugin(ARGS),
   ],
@@ -207,7 +233,9 @@ if (ARGS["watch"]) {
 try {
   let result = await esbuild.build(ESBUILD_OPTIONS);
 
-  let text = await esbuild.analyzeMetafile(result.metafile);
+  let text = await esbuild.analyzeMetafile(result.metafile, {
+    verbose: true,
+  });
   console.log(text);
   process.exit(0);
 } catch(e) {
