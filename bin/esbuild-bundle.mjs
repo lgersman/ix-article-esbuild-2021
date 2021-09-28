@@ -82,7 +82,6 @@
            "node_modules",
            path,
          );
-         console.log(absPath);
  
          const globalName = computeGlobalName(path.match(regexp));
          contents.push(`export default ${globalName};`);
@@ -100,7 +99,9 @@
  
            if(globalName) {
              contents.push(
-               `export const { ${exports} } = ${globalName};`,
+               // `export const { ${exports} } = ${globalName};`,
+               `import { ${exports} } = ${globalName};`
+               `export { ${exports} };`,
              );
            } else {
              contents.push(
@@ -184,10 +185,26 @@
    //treeShaking: true,
    plugins: [
      ESBuildGlobalExternalsPlugin({
-      regexp: /^@wordpress\/(.+)?$/,
-      computeGlobalName: ([, wordpressPackage]) =>
-        "window.wp." +
-        wordpressPackage.replace(/-(.)/g, (_, $1) => $1.toUpperCase()),
+      regexp: /^(React|react|react-dom|@(wordpress))(\/(.+))?$/,
+      computeGlobalName: ([,
+        simplePackageName,
+        packageScope,
+        ,
+        packageName,]) => {
+        switch (packageScope || simplePackageName) {
+          case "React":
+            return `window.${simplePackageName}`;
+          case "react":
+          case "react-dom":
+            return "window.wp.element";
+          case "wordpress":
+            if(packageScope !== "@wordpress" && !['icons', 'primitives'].includes(packageName)) {
+              return `window.${
+                packageScope === "wordpress" ? "wp" : packageScope
+              }.${packageName.replace(/-(.)/g, (_, $1) => $1.toUpperCase())}`;
+            }
+        }
+      },
      }),
      ESBuildSassPlugin(ARGS),
    ],

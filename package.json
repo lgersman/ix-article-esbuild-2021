@@ -20,7 +20,7 @@
     "gutenberg"
   ],
   "peerDependencies": {
-    "@wordpress/icons": "^5.0.0",
+    "@wordpress/icons": "^5.0.2",
     "debug": "^4.3.1"
   }
 }
