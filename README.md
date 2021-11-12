@@ -21,3 +21,7 @@ run `make dev`
 # help
 
 run `make help` to see all commands
+
+# similar efforts
+
+- esbuild-bundler : https://github.com/adambrgmn/wp-bundler/blob/main/src/plugins/externals.ts

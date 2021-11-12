@@ -2,6 +2,7 @@ import element from "@wordpress/element";
 import domReady from "@wordpress/dom-ready";
 import components from "@wordpress/components";
 import { Icon, download } from "@wordpress/icons";
+import { __ } from "@wordpress/i18n";
 
 import Debug from "debug";
 
@@ -28,9 +29,9 @@ function MyButton({ label }) {
 domReady(() => {
   element.render(
     <div>
-      <MyButton label="hello world" />
-      <Component1 text="c1" />
-      <Component1 text="c2" />
+      <MyButton label={__("hello world")} />
+      <Component1 text={__("c1")} />
+      <Component1 text={__("c2")} />
     </div>,
     document.getElementById("editor"),
   );
