@@ -21,6 +21,10 @@ all: transpile ## (default) builds the project
 
 node_modules: package-lock.json
 	npm -q  --no-fund ci
+# fixes repeated installation of node_modules again and again 
+# (https://gist.github.com/hallettj/29b8e7815b264c88a0a0ee9dcddb6210)
+	@touch -m node_modules
+	
 
 package-lock.json: 
 	npm install --no-fund --package-lock-only
