@@ -1,0 +1,1 @@
+- consider using https://www.npmjs.com/package/@parcel/watcher as replacement for `entr` to provide a more reliable way to watch for changes
